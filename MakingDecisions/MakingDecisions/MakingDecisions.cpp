@@ -3,14 +3,23 @@
 #include <thread>
 #include <cstdlib>
 
+#include "GameDayTime.h"
+
 using namespace std;
 const int fps = 5;
 long long baseSleep = 0;
 double prevDTime = 0;
 
+GameDayTime* dayTime;
+
+void init()
+{
+    dayTime = new GameDayTime();
+}
+
 void render()
 {
-    //system("CLS");
+    cout << "Day: " << dayTime->day << ", Time: " << dayTime->time << endl;
 }
 
 /*
@@ -18,12 +27,13 @@ Write all logic into this fuction
 */
 void update(double dTime)
 {
-    //cout << "Game update: " << dTime << endl;
+    dayTime->updateTime(dTime, 0.5f);
 }
 
 int main()
 {
     baseSleep = (1.0f / (double)fps) * 1000;
+    init();
 
     while (true)
     {

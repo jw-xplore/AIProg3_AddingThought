@@ -127,7 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameDayTime.cpp" />
     <ClCompile Include="MakingDecisions.cpp" />
+    <ClCompile Include="NPCPerson.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GameDayTime.h" />
+    <ClInclude Include="NPCPerson.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
