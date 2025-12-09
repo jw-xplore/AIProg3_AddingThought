@@ -2,7 +2,7 @@
 
 NPCPerson::NPCPerson()
 {
-
+	// Setup schedule
 }
 
 void NPCPerson::performAction(NPCAction action)

@@ -11,21 +11,33 @@ enum NPCAction
 
 struct ScheduleEntry
 {
-	double startTime;
-	double endTime;
 	NPCAction action;
-	int cost;
+	NPCResources gainCost;
+};
+
+struct TimedScheduleEntry
+{
+	float start;
+	float end;
+	NPCAction action;
+	NPCResources gainCost;
+};
+
+struct NPCResources
+{
+	float stomachLevel;		// Hunger
+	float hydratationLevel; // Thirst
+	float socialLevel;		// Friends
+	float sleepLevel;
+
+	int money;
 };
 
 class NPCPerson
 {
 public:
 	float hp;
-	float stomachLevel;
-	float socialLevel;
-	float sleepLevel;
-
-	int money;
+	NPCResources resources;
 
 	// desire - stuff that person wants to buy
 	// address - where person lives/sleep
@@ -34,6 +46,9 @@ public:
 	NPCAction currentAction;
 	double actionTime; // How long will action take
 	double actionTimeSpent; // How long is person doing the action
+
+	// Schedule
+	ScheduleEntry* schedule = new ScheduleEntry[24];
 
 	NPCPerson();
 	void performAction(NPCAction action);
