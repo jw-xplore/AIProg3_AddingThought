@@ -1,8 +1,31 @@
 #include "NPCPerson.h"
+#include "World.h"
 
-NPCPerson::NPCPerson()
+NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, Workplace* workplace)
 {
+	this->name = name;
+	this->world = world;
+
+	this->resources.money = money;
+	this->home = home;
+	this->workplace = workplace;
+
+	currentPlace = home;
+
+	// Setup stable schedule - fill with work, 8h sleep, wake up 1h before work, eat before work, at lunch time and after work
+	int startW = workplace->startTime;
+	int endW = workplace->endTime;
+
+	preplannedSchedule.push_back(TimedScheduleEntry(0, startW - 1, NPCAction::SleepHome));
+	preplannedSchedule.push_back(TimedScheduleEntry(startW - 1, startW, NPCAction::Eat));
+	preplannedSchedule.push_back(TimedScheduleEntry(startW, workplace->lunchTime, NPCAction::Work));
+	preplannedSchedule.push_back(TimedScheduleEntry(workplace->lunchTime, workplace->lunchTime + 1, NPCAction::Eat));
+	preplannedSchedule.push_back(TimedScheduleEntry(workplace->lunchTime + 1, endW, NPCAction::Work));
+	preplannedSchedule.push_back(TimedScheduleEntry(endW, endW + 1, NPCAction::Eat));
+	preplannedSchedule.push_back(TimedScheduleEntry(23 - 8 + startW, 24, NPCAction::SleepHome));
+
 	// Setup schedule
+	planDay();
 }
 
 void NPCPerson::performAction(NPCAction action)
@@ -11,8 +34,62 @@ void NPCPerson::performAction(NPCAction action)
 	{
 	case NPCAction::Eat: break;
 	case NPCAction::Work: break;
-	case NPCAction::Sleep: break;
+	case NPCAction::SleepHome: break;
 	case NPCAction::Hangout: break;
 	case NPCAction::Shop: break;
 	}
+}
+
+/*
+Preplan day schedule to setup base activities
+*/
+void NPCPerson::planDay()
+{
+	// Clear schedule
+	for (int i = 0; i < 24; i++)
+	{
+		schedule[i] = NPCAction::None;
+	}
+
+	// Assign schedule
+	for (int i = 0; i < preplannedSchedule.size(); i++)
+	{
+		int start = preplannedSchedule[i].start;
+		int end = preplannedSchedule[i].end;
+		NPCAction action = preplannedSchedule[i].action;
+
+		for (int x = start; x < end; x++)
+		{
+			schedule[x] = action;
+		}
+	}
+}
+
+/*
+Provides string format name to each action
+*/
+std::string NPCPerson::actionName(NPCAction action)
+{
+	switch (action)
+	{
+	case None:  return "Idle";
+	case Work: return "Work";
+	case Eat: return "Eat";
+	case SleepHome: return "Sleep";
+	case Hangout: return "Hangout";
+	case Shop: return "Shop";
+	default:
+		break;
+	}
+	
+	return "";
+}
+
+/*
+Perform current action in schedule based on time
+	- Plan next actions for free slots??
+*/
+void NPCPerson::followSchedule(float time)
+{
+	currentAction = schedule[(int)time];
 }

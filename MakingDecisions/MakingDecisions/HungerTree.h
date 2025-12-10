@@ -1,6 +1,6 @@
 #pragma once
 #include "DecisionTree.h"
-
+/*
 class DecIsHungry : public Decision
 {
 public:
@@ -9,10 +9,12 @@ public:
 		return person->resources.stomachLevel < 0.5f;
 	}
 };
+*/
 
 /*
 Hunger tree structure
 */
+/*
 struct HungerTree
 {
 	Decision* root;
@@ -20,10 +22,10 @@ struct HungerTree
 	HungerTree()
 	{
 		root = new DecIsHungry();
-
 	}
 	~HungerTree()
 	{
 		delete root;
 	}
 };
+*/

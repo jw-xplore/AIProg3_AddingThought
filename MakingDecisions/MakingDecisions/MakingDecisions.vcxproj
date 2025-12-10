@@ -130,10 +130,15 @@
     <ClCompile Include="GameDayTime.cpp" />
     <ClCompile Include="MakingDecisions.cpp" />
     <ClCompile Include="NPCPerson.cpp" />
+    <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Buildings.h" />
+    <ClInclude Include="DecisionTree.h" />
     <ClInclude Include="GameDayTime.h" />
+    <ClInclude Include="HungerTree.h" />
     <ClInclude Include="NPCPerson.h" />
+    <ClInclude Include="World.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

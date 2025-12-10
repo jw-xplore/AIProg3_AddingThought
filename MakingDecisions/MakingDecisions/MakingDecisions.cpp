@@ -2,24 +2,27 @@
 #include <chrono>
 #include <thread>
 #include <cstdlib>
+#include <windows.h>
 
-#include "GameDayTime.h"
+#include "World.h"
 
 using namespace std;
 const int fps = 5;
 long long baseSleep = 0;
 double prevDTime = 0;
 
-GameDayTime* dayTime;
+World* world;
 
 void init()
 {
-    dayTime = new GameDayTime();
+    world = new World();
 }
 
 void render()
 {
-    cout << "Day: " << dayTime->day << ", Time: " << dayTime->time << endl;
+    cout << "Day: " << world->day << ", Time: " << world->time << endl;
+    cout << "----------------------------------------" << endl;
+    world->showPeopleStatus();
 }
 
 /*
@@ -27,7 +30,7 @@ Write all logic into this fuction
 */
 void update(double dTime)
 {
-    dayTime->updateTime(dTime, 0.5f);
+    world->updateTime(dTime, 0.25f);
 }
 
 int main()
@@ -37,6 +40,10 @@ int main()
 
     while (true)
     {
+        // ESC - press check
+        if (GetAsyncKeyState(27) & 0x8000)
+            break;
+
         system("CLS");
         auto start = chrono::system_clock::now();
         update(prevDTime);

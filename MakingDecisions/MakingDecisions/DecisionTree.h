@@ -5,6 +5,7 @@
 class DecisionTreeNode
 {
 public:
+	DecisionTreeNode();
 	virtual DecisionTreeNode* makeDecision(NPCPerson* person, World* world);
 };
 
@@ -27,8 +28,8 @@ public:
 
 	~Decision()
 	{
-		delete positive->makeDecision();
-		delete negative->makeDecision();
+		//elete positive->makeDecision();
+		//delete negative->makeDecision();
 	}
 
 	virtual bool pass(NPCPerson* person, World* world) { return true; }
