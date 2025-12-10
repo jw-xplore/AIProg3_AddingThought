@@ -36,6 +36,24 @@ struct TimedScheduleEntry
 	}
 };
 
+struct ScheduleEntry
+{
+	NPCAction action;
+	Building* place;
+
+	ScheduleEntry()
+	{
+		action = NPCAction::None;
+		place = nullptr;
+	}
+
+	ScheduleEntry(NPCAction act, Building* plc)
+	{
+		action = act;
+		place = plc;
+	}
+};
+
 class NPCPerson
 {
 public:
@@ -55,14 +73,14 @@ public:
 
 	// Schedule
 	std::vector<TimedScheduleEntry> preplannedSchedule;
-	NPCAction* schedule = new NPCAction[24];
+	ScheduleEntry* schedule = new ScheduleEntry[24];
 
 	NPCPerson(std::string name, World* world, int money, Building* home, Workplace* workplace);
 	void performAction(NPCAction action);
 	void planDay();
 	std::string actionName(NPCAction action);
 
-	void followSchedule(float time);
+	void followSchedule(float time, float prevTime);
 
 	void work();
 	void eat();

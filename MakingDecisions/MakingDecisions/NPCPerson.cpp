@@ -7,6 +7,9 @@ NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, 
 	this->world = world;
 
 	this->resources.money = money;
+	this->resources.sleepLevel = 0.9;
+	this->resources.stomachLevel = 0.7;
+
 	this->home = home;
 	this->workplace = workplace;
 
@@ -26,6 +29,11 @@ NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, 
 
 	// Setup schedule
 	planDay();
+
+	// Start action
+	int currentHour = world->time;
+	currentAction = schedule[currentHour].action;
+	currentPlace = schedule[currentHour].place;
 }
 
 void NPCPerson::performAction(NPCAction action)
@@ -48,7 +56,7 @@ void NPCPerson::planDay()
 	// Clear schedule
 	for (int i = 0; i < 24; i++)
 	{
-		schedule[i] = NPCAction::None;
+		schedule[i] = ScheduleEntry(NPCAction::None, home);
 	}
 
 	// Assign schedule
@@ -58,9 +66,18 @@ void NPCPerson::planDay()
 		int end = preplannedSchedule[i].end;
 		NPCAction action = preplannedSchedule[i].action;
 
+		// Building
+		Building* place = home;
+		switch (action)
+		{
+		case NPCAction::Eat: place = world->findBuidling<Diner>(); break;
+		case NPCAction::Work: place = workplace; break;
+		}
+
+		// Add to each hour
 		for (int x = start; x < end; x++)
 		{
-			schedule[x] = action;
+			schedule[x] = ScheduleEntry(action, place);
 		}
 	}
 }
@@ -89,7 +106,18 @@ std::string NPCPerson::actionName(NPCAction action)
 Perform current action in schedule based on time
 	- Plan next actions for free slots??
 */
-void NPCPerson::followSchedule(float time)
+void NPCPerson::followSchedule(float time, float prevTime)
 {
-	currentAction = schedule[(int)time];
+	if ((int)prevTime < (int)time || (int)prevTime == 23 && (int)time == 0)
+	{
+		// End action - receive gains and loses
+
+		// TODO: Make system based on tasks/action and rewards
+
+		// Start action
+		currentAction = schedule[(int)time].action;
+		currentPlace = schedule[(int)time].place;
+	}
+
+	//currentAction = schedule[(int)time];
 }

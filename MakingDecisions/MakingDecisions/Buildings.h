@@ -12,6 +12,11 @@ public:
 	{
 		this->name = name;
 	}
+
+	virtual ~Building()
+	{
+
+	}
 };
 
 class Workplace : public Building
@@ -52,5 +57,19 @@ public:
 		cost = money;
 		stomachLevelGain = food;
 		energyGain = energy;
+	}
+};
+
+class Bar : public Building
+{
+public:
+	int cost;
+	float energyLoss;
+
+	Bar(std::string name, int money, float energy)
+	{
+		this->name = name;
+		cost = money;
+		energyLoss = energy;
 	}
 };

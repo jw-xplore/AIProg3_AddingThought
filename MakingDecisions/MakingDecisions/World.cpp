@@ -32,6 +32,8 @@ void World::showPeopleStatus()
 
 void World::updateTime(double dTime, double timeScale)
 {
+	float prevTime = time;
+
 	// Progress time
 	time += dTime * timeScale;
 	if (time - (int)time > 0.6f)
@@ -49,6 +51,6 @@ void World::updateTime(double dTime, double timeScale)
 	// Update people
 	for (int i = 0; i < people.size(); i++)
 	{
-		people[i]->followSchedule(time);
+		people[i]->followSchedule(time, prevTime);
 	}
 }
