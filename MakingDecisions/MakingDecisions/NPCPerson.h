@@ -4,6 +4,7 @@
 #include "Buildings.h"
 
 class World;
+class Action;
 
 enum NPCAction
 {
@@ -67,6 +68,7 @@ public:
 	Workplace* workplace;
 
 	NPCAction currentAction;
+	Action* currentExecutiveAction;
 	Building* currentPlace;
 	double actionTime; // How long will action take
 	double actionTimeSpent; // How long is person doing the action

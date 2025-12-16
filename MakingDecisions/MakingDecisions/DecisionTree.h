@@ -1,18 +1,20 @@
 #pragma once
+#include <string>
 #include "World.h"
 #include "NPCPerson.h"
 
 class DecisionTreeNode
 {
 public:
-	DecisionTreeNode();
-	virtual DecisionTreeNode* makeDecision(NPCPerson* person, World* world);
+	DecisionTreeNode() {}
+	virtual DecisionTreeNode* makeDecision(NPCPerson* person, World* world) { return this;  }
 };
 
 class Action : public DecisionTreeNode
 {
 public:
-	virtual void action();
+	std::string name;
+	virtual void execute(NPCPerson* person, World* world) {}
 
 	DecisionTreeNode* makeDecision(NPCPerson* person, World* world) override
 	{

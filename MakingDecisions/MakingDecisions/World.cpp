@@ -1,8 +1,11 @@
 #include "World.h"
 #include <iostream>
+#include "TreeManager.h"
 
 World::World()
 {
+	treeManager = new TreeManager();
+
 	// Buildings
 	Building* home1 = new Building("House 001");
 	Workplace* factory = new Workplace("Factory", 2, 0.1, 7, 12, 15);
@@ -26,7 +29,8 @@ void World::showPeopleStatus()
 
 		std::cout << people[i]->name << std::endl;
 		std::cout << "Hunger: " << rsc->stomachLevel << ", Energy: " << rsc->sleepLevel << ", Money: " << rsc->money << std::endl;
-		std::cout << "Doing: " << people[i]->actionName(people[i]->currentAction) << ", At: " << people[i]->currentPlace->name << std::endl;
+		//std::cout << "Doing: " << people[i]->actionName(people[i]->currentAction) << ", At: " << people[i]->currentPlace->name << std::endl;
+		std::cout << "Doing: " << people[i]->currentExecutiveAction->name << ", At: " << people[i]->currentPlace->name << std::endl;
 	}
 }
 
@@ -35,7 +39,8 @@ void World::updateTime(double dTime, double timeScale)
 	float prevTime = time;
 
 	// Progress time
-	time += dTime * timeScale;
+	lastTimeChange = dTime * timeScale;
+	time += lastTimeChange;
 	if (time - (int)time > 0.6f)
 	{
 		time = (int)time + 1 + (time - (int)time - 0.6f);
@@ -51,6 +56,9 @@ void World::updateTime(double dTime, double timeScale)
 	// Update people
 	for (int i = 0; i < people.size(); i++)
 	{
-		people[i]->followSchedule(time, prevTime);
+		//people[i]->followSchedule(time, prevTime);
+		DecisionTreeNode* action = treeManager->workTree->makeDecision(people[i], this);
+		people[i]->currentExecutiveAction = dynamic_cast<Action*>(action);
+		people[i]->currentExecutiveAction->execute(people[i], this);
 	}
 }

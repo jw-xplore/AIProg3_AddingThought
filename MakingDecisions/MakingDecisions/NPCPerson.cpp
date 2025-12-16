@@ -1,4 +1,5 @@
 #include "NPCPerson.h"
+#include "DecisionTree.h"
 #include "World.h"
 
 NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, Workplace* workplace)

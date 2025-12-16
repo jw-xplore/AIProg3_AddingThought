@@ -127,17 +127,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AllActions.cpp" />
+    <ClCompile Include="AllDecisions.cpp" />
     <ClCompile Include="GameDayTime.cpp" />
     <ClCompile Include="MakingDecisions.cpp" />
     <ClCompile Include="NPCPerson.cpp" />
+    <ClCompile Include="TreeManager.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AllActions.h" />
+    <ClInclude Include="AllDecisions.h" />
     <ClInclude Include="Buildings.h" />
     <ClInclude Include="DecisionTree.h" />
     <ClInclude Include="GameDayTime.h" />
     <ClInclude Include="HungerTree.h" />
     <ClInclude Include="NPCPerson.h" />
+    <ClInclude Include="TreeManager.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

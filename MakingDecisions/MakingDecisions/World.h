@@ -4,15 +4,20 @@
 #include <vector>
 #include <type_traits>
 
+class TreeManager;
+
 /*
 World representing buldings and players
 */
 class World
 {
 public:
+	TreeManager* treeManager;
+
 	std::vector<Building*> buildings;
 	std::vector<NPCPerson*> people;
 
+	double lastTimeChange = 0;
 	double time = 6.0f;
 	int day = 1;
 
