@@ -25,6 +25,7 @@ NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, 
 	// Setup stable schedule - fill with work, 8h sleep, wake up 1h before work, eat before work, at lunch time and after work
 	int startW = workplace->startTime;
 	int endW = workplace->endTime;
+	sleepHour = 23 - 8 + startW;
 
 	preplannedSchedule.push_back(TimedScheduleEntry(0, startW - 1, NPCAction::SleepHome));
 	preplannedSchedule.push_back(TimedScheduleEntry(startW - 1, startW, NPCAction::Eat));
@@ -32,7 +33,7 @@ NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, 
 	preplannedSchedule.push_back(TimedScheduleEntry(workplace->lunchTime, workplace->lunchTime + 1, NPCAction::Eat));
 	preplannedSchedule.push_back(TimedScheduleEntry(workplace->lunchTime + 1, endW, NPCAction::Work));
 	preplannedSchedule.push_back(TimedScheduleEntry(endW, endW + 1, NPCAction::Eat));
-	preplannedSchedule.push_back(TimedScheduleEntry(23 - 8 + startW, 24, NPCAction::SleepHome));
+	preplannedSchedule.push_back(TimedScheduleEntry(sleepHour, 24, NPCAction::SleepHome));
 
 	// Setup schedule
 	planDay();
@@ -53,16 +54,7 @@ NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, 
 void NPCPerson::update(float dTime)
 {
 	// React to messages 
-	for (int i = 0; i < messagesQueue.size(); i++)
-	{
-		//messagesQueue[i].
-
-		Message* msg = new Message();
-		msg->inPerson = messagesQueue[i]->inPerson;
-		this->world->logMessage(*msg, this, messagesQueue[i]->sender);
-	}
-
-	messagesQueue.clear();
+	handleMessageQueue();
 
 	// Reach out to people - send message
 	reachOutTime -= dTime;
@@ -231,10 +223,104 @@ Sending messages to other NPCs
 */
 void NPCPerson::sendMessage(NPCPerson* recipient)
 {
+	// Try send invite
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dist(0, 3);
+	if (dist(gen) > 2)
+	{
+		sendInvite(recipient);
+		return;
+	}
+
+	// Send simple message 
 	Message* msg = new Message();
 	msg->sender = this;
 	msg->inPerson = this->currentPlace == recipient->currentPlace;
 
+	// Send out
 	recipient->messagesQueue.push_back(msg);
 	this->world->logMessage(*msg, this, recipient);
+}
+
+void NPCPerson::sendInvite(NPCPerson* recipient)
+{
+	InviteMessage* msg = new InviteMessage();
+	msg->sender = this;
+	msg->inPerson = this->currentPlace == recipient->currentPlace;
+	msg->place = this->world->bars[0];
+
+	// Hour
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dist(this->workplace->endTime + 1, sleepHour - 1);
+
+	msg->hour = dist(gen);
+
+	msg->content = "Wanna meet in " + msg->place->name + " at " + std::to_string(msg->hour) + "?";
+
+	// Send out
+	recipient->messagesQueue.push_back(msg);
+	this->world->logMessage(*msg, this, recipient);
+}
+
+/*
+React to all incoming messages
+*/
+void NPCPerson::handleMessageQueue()
+{
+	for (int i = 0; i < messagesQueue.size(); i++)
+	{
+		// Invite response
+		InviteMessage* invite = dynamic_cast<InviteMessage*>(messagesQueue[i]);
+		if (invite != nullptr)
+		{
+			bool positive = true;
+
+			if (schedule[invite->hour].action != NPCAction::None)
+			{
+				// Say no if blocked
+				positive = false;
+			}
+			else
+			{
+				// Randomly say yes or no
+				static std::random_device rd;
+				static std::mt19937 gen(rd());
+				std::uniform_int_distribution<> dist(0, 2);
+
+				if (dist(gen) == 0)
+					positive = false;
+			}
+
+			invite->respond(positive);
+
+			// Send out
+			Message* msg = new Message();
+			msg->inPerson = messagesQueue[i]->inPerson;
+
+			if (positive)
+			{
+				msg->content = "Yes!";
+
+				// Store in schedule
+				this->schedule[invite->hour].action = NPCAction::Hangout;
+				this->schedule[invite->hour].place = invite->place;
+			}
+			else
+				msg->content = "Sorry, can't make it.";
+
+			this->world->logMessage(*msg, this, messagesQueue[i]->sender);
+
+			continue;
+		}
+
+		// Response to basic
+		Message* msg = new Message();
+		msg->inPerson = messagesQueue[i]->inPerson;
+		this->world->logMessage(*msg, this, messagesQueue[i]->sender);
+	}
+
+	// Remove all
+	messagesQueue.clear();
 }

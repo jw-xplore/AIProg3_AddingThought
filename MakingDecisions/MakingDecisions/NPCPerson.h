@@ -80,6 +80,7 @@ public:
 	int wish = -1; // stuff that person wants to buy
 	Building* home; // where person lives/sleep
 	Workplace* workplace;
+	int sleepHour = 0;
 
 	TreeManager* treeManager;
 	NPCAction currentAction;
@@ -106,5 +107,6 @@ public:
 
 	void sendMessage(NPCPerson* recipient);
 	void sendInvite(NPCPerson* recipient);
+	void handleMessageQueue();
 };
 

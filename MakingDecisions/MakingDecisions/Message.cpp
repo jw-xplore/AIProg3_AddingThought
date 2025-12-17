@@ -4,10 +4,15 @@
 
 InviteMessage::InviteMessage()
 {
-	this->content = "Wanna meet in " + this->place->name + " at " + std::to_string(this->hour) + "?";
+	
 }
 
 void InviteMessage::respond(bool positive)
 {
-
+	if (positive)
+	{
+		// Store into schedule
+		this->sender->schedule[this->hour].action = NPCAction::Hangout;
+		this->sender->schedule[this->hour].place = this->place;
+	}
 }
