@@ -3,8 +3,10 @@
 #include "NPCPerson.h"
 #include <vector>
 #include <type_traits>
+#include <string>
 
 class TreeManager;
+class Message;
 
 /*
 World representing buldings and players
@@ -12,9 +14,20 @@ World representing buldings and players
 class World
 {
 public:
-	std::vector<Building*> buildings;
 	std::vector<NPCPerson*> people;
 	std::vector<Item> items;
+
+	// Buildings
+	std::vector<Building*> houses;
+	std::vector<Building*> shops;
+	std::vector<Diner*> diners;
+	std::vector<Bar*> bars;
+	std::vector<Workplace*> workplaces;
+
+	int messagesLogSize = 10;
+	int lastMsg = -1;
+	std::string* messagesLog = new std::string[messagesLogSize];
+
 
 	double lastTimeChange = 0;
 	double time = 15.0f;
@@ -23,21 +36,11 @@ public:
 	World();
 
 	void showPeopleStatus();
+	void showMessagesLog();
 	void updateTime(double dTime, double timeScale);
 
-	/*
-	Return first building of selected subtype
-	*/
-	template<class T>
-	Building* findBuidling()
-	{
-		for (int i = 0; i < buildings.size(); i++)
-		{
-			if (dynamic_cast<const T*>(buildings[i]) != nullptr)
-				return buildings[i];
-		}
+	void logMessage(Message msg, NPCPerson* sender, NPCPerson* recipient);
 
-		return nullptr;
-	}
+	NPCPerson* randomPerson(NPCPerson* exclude);
 };
 

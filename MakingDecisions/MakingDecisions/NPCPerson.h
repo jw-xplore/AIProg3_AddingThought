@@ -64,12 +64,17 @@ struct ScheduleEntry
 	}
 };
 
+class Message;
+
 class NPCPerson
 {
 public:
 	std::string name;
 	float hp;
 	NPCResources resources;
+
+	std::vector<Message*> messagesQueue;
+	float reachOutTime = 0;
 
 	World* world;
 	int wish = -1; // stuff that person wants to buy
@@ -98,5 +103,8 @@ public:
 
 	void randomWish();
 	int wishCost();
+
+	void sendMessage(NPCPerson* recipient);
+	void sendInvite(NPCPerson* recipient);
 };
 

@@ -14,6 +14,8 @@ void BuyWishItemAction::execute(NPCPerson* person, World* world)
 
 void EatAction::execute(NPCPerson* person, World* world)
 {
+	person->currentPlace = world->diners[0];
+
 	// Decrease energy
 	person->resources.sleepLevel -= 0.002f;
 	if (person->resources.sleepLevel < 0)
@@ -31,13 +33,7 @@ void EatAction::execute(NPCPerson* person, World* world)
 
 void WorkAction::execute(NPCPerson* person, World* world)
 {
-	/*
-	// Add money if hour has passed 
-	int prevHour = (int)(world->time - world->lastTimeChange);
-
-	if (prevHour < (int)world->time)
-		person->resources.money += moneyGain;
-	*/
+	person->currentPlace = person->workplace;
 
 	// Decrease food 
 	person->resources.stomachLevel -= 0.01f;
@@ -56,6 +52,8 @@ void WorkAction::execute(NPCPerson* person, World* world)
 
 void SleepAction::execute(NPCPerson* person, World* world)
 {
+	person->currentPlace = person->home;
+
 	// Decrease food 
 	person->resources.stomachLevel -= 0.005f;
 	if (person->resources.stomachLevel < 0)
@@ -73,6 +71,8 @@ void SleepAction::execute(NPCPerson* person, World* world)
 
 void ShopAction::execute(NPCPerson* person, World* world)
 {
+	person->currentPlace = world->shops[0];
+
 	// Decrease food 
 	person->resources.stomachLevel -= 0.01f;
 	if (person->resources.stomachLevel < 0)

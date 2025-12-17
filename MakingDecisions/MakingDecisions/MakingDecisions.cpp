@@ -23,6 +23,9 @@ void render()
     cout << "Day: " << world->day << ", Time: " << world->time << endl;
     cout << "----------------------------------------" << endl;
     world->showPeopleStatus();
+    cout << "----------------------------------------" << endl;
+    cout << "Messages:" << endl;
+    world->showMessagesLog();
 }
 
 /*

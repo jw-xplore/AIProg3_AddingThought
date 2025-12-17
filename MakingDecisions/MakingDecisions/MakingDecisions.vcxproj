@@ -131,6 +131,7 @@
     <ClCompile Include="AllDecisions.cpp" />
     <ClCompile Include="GameDayTime.cpp" />
     <ClCompile Include="MakingDecisions.cpp" />
+    <ClCompile Include="Message.cpp" />
     <ClCompile Include="NPCPerson.cpp" />
     <ClCompile Include="TreeManager.cpp" />
     <ClCompile Include="World.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="DecisionTree.h" />
     <ClInclude Include="GameDayTime.h" />
     <ClInclude Include="HungerTree.h" />
+    <ClInclude Include="Message.h" />
     <ClInclude Include="NPCPerson.h" />
     <ClInclude Include="TreeManager.h" />
     <ClInclude Include="World.h" />

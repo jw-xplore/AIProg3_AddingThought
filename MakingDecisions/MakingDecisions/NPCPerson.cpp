@@ -2,6 +2,7 @@
 #include "DecisionTree.h"
 #include "World.h"
 #include "TreeManager.h"
+#include "Message.h"
 #include <random>
 
 NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, Workplace* workplace)
@@ -37,6 +38,12 @@ NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, 
 	planDay();
 	followSchedule();
 
+	// Set random time to reachout
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dist(2, 4);
+	reachOutTime = dist(gen);
+
 	// Start action
 	int currentHour = world->time;
 	currentAction = schedule[currentHour].action;
@@ -45,6 +52,34 @@ NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, 
 
 void NPCPerson::update(float dTime)
 {
+	// React to messages 
+	for (int i = 0; i < messagesQueue.size(); i++)
+	{
+		//messagesQueue[i].
+
+		Message* msg = new Message();
+		msg->inPerson = messagesQueue[i]->inPerson;
+		this->world->logMessage(*msg, this, messagesQueue[i]->sender);
+	}
+
+	messagesQueue.clear();
+
+	// Reach out to people - send message
+	reachOutTime -= dTime;
+	if (reachOutTime <= 0)
+	{
+		// Pick random person to message
+		NPCPerson* recipient = world->randomPerson(this);
+		sendMessage(recipient);
+
+		// Set random time to reachout
+		static std::random_device rd;
+		static std::mt19937 gen(rd());
+		std::uniform_int_distribution<> dist(4, 10);
+
+		reachOutTime = dist(gen);
+	}
+
 	// Execute current action
 	if (currentExecutiveAction != nullptr)
 		currentExecutiveAction->execute(this, this->world);
@@ -102,7 +137,7 @@ void NPCPerson::planDay()
 		Building* place = home;
 		switch (action)
 		{
-		case NPCAction::Eat: place = world->findBuidling<Diner>(); break;
+		case NPCAction::Eat: place = world->diners[0]; break;
 		case NPCAction::Work: place = workplace; break;
 		}
 
@@ -189,4 +224,17 @@ void NPCPerson::randomWish()
 int NPCPerson::wishCost()
 {
 	return this->world->items[wish].cost;
+}
+
+/*
+Sending messages to other NPCs
+*/
+void NPCPerson::sendMessage(NPCPerson* recipient)
+{
+	Message* msg = new Message();
+	msg->sender = this;
+	msg->inPerson = this->currentPlace == recipient->currentPlace;
+
+	recipient->messagesQueue.push_back(msg);
+	this->world->logMessage(*msg, this, recipient);
 }
