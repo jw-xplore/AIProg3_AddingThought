@@ -7,7 +7,7 @@
 #include "World.h"
 
 using namespace std;
-const int fps = 2;
+const int fps = 5;
 long long baseSleep = 0;
 double prevDTime = 0;
 
@@ -30,7 +30,7 @@ Write all logic into this fuction
 */
 void update(double dTime)
 {
-    world->updateTime(dTime, 0.1f);
+    world->updateTime(dTime, 0.5f);
 }
 
 int main()

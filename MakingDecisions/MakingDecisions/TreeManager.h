@@ -1,13 +1,17 @@
 #pragma once
-
 #include "DecisionTree.h"
+
+class NPCPerson;
+
 /*
 Holds reference to all decision trees definitions
 */
 class TreeManager
 {
 public:
-	TreeManager();
+	NPCPerson* owner;
+
+	TreeManager(NPCPerson* person);
 
 	// Trees
 	DecisionTreeNode* workTree;
@@ -20,7 +24,7 @@ public:
 	void DefineWorkTree();
 	void DefineEatTree();
 	void DefineSleepTree();
-	void DefineHnagoutTree();
+	void DefineHangoutTree();
 	void DefineShopTree();
 	void DefineFreeTree();
 };

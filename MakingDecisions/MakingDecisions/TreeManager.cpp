@@ -1,24 +1,17 @@
 #include "TreeManager.h"
 #include "AllDecisions.h"
 #include "AllActions.h"
+#include "NPCPerson.h"
 
-TreeManager::TreeManager()
+TreeManager::TreeManager(NPCPerson* person)
 {
-	/*--------------------------------------------------------------
-	Define work tree
-	--------------------------------------------------------------*/
+	owner = person;
+
+	// Define decision trees
+	DefineFreeTree();
 	DefineWorkTree();
 	DefineEatTree();
-
-	// Define eat tree
-
-	// Define sleep tree
-
-	// Define hangout tree
-
-	// Define shop tree
-
-	// Define  tree
+	DefineSleepTree();
 }
 
 void TreeManager::DefineWorkTree()
@@ -71,4 +64,27 @@ void TreeManager::DefineSleepTree()
 	Decision* energyDec = dynamic_cast<Decision*>(sleepTree);
 	energyDec->positive = freeTree; // Consider free action
 	energyDec->negative = new SleepAction(); // Go sleep
+}
+
+/*
+What to do if there is no action scheduled
+*/
+void TreeManager::DefineFreeTree()
+{
+	freeTree = new IsHungryDecision(0.6f);
+
+	// Is NPC at least little hungry?
+	Decision* hungerDec = dynamic_cast<Decision*>(freeTree);
+	hungerDec->positive = new EatAction(); // Eat
+	hungerDec->negative = new HasEnergyDecision(0.4f);
+
+	// Needs sleep?
+	Decision* energyDec = dynamic_cast<Decision*>(hungerDec->negative);
+	energyDec->positive = new HasMoneyDecision(owner->wishCost());
+	energyDec->negative = new SleepAction(); // Go sleep
+
+	// Can afford to buy wished item?
+	Decision* shopDec = dynamic_cast<Decision*>(energyDec->positive);
+	shopDec->positive = new ShopAction(); // Buy item
+	shopDec->negative = new WorkAction(); // Work some more
 }

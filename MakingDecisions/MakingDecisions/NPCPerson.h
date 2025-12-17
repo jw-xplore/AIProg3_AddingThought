@@ -5,6 +5,7 @@
 
 class World;
 class Action;
+class TreeManager;
 
 enum NPCAction
 {
@@ -14,6 +15,14 @@ enum NPCAction
 	SleepHome,
 	Hangout,
 	Shop,
+};
+
+struct Item
+{
+	std::string name;
+	int cost;
+
+	Item(std::string nam, int cst) { name = nam; cost = cst; }
 };
 
 struct NPCResources
@@ -63,10 +72,11 @@ public:
 	NPCResources resources;
 
 	World* world;
-	// desire - stuff that person wants to buy
+	int wish = -1; // stuff that person wants to buy
 	Building* home; // where person lives/sleep
 	Workplace* workplace;
 
+	TreeManager* treeManager;
 	NPCAction currentAction;
 	Action* currentExecutiveAction;
 	Building* currentPlace;
@@ -83,12 +93,10 @@ public:
 	void planDay();
 	std::string actionName(NPCAction action);
 
+	void finishCurretAction();
 	void followSchedule();
 
-	void work();
-	void eat();
-	void sleepHome();
-	void hangout();
-	void shop();
+	void randomWish();
+	int wishCost();
 };
 

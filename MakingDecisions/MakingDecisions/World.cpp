@@ -5,7 +5,16 @@
 
 World::World()
 {
-	treeManager = new TreeManager();
+	//treeManager = new TreeManager();
+
+	// Items
+	items.push_back(Item("Coffee", 10));
+	items.push_back(Item("Kanelbulle", 20));
+	items.push_back(Item("Vasterbottensost", 100));
+	items.push_back(Item("Snus", 150));
+	items.push_back(Item("Coffee machine", 200));
+	items.push_back(Item("Bastu", 500));
+	items.push_back(Item("Raggarbil", 1000));
 
 	// Buildings
 	Building* home1 = new Building("House 001");
@@ -29,9 +38,14 @@ void World::showPeopleStatus()
 		NPCResources* rsc = &people[i]->resources;
 
 		std::cout << people[i]->name << std::endl;
+
+		// State and wish
 		std::cout << "HP: " << people[i]->hp << ", Hunger: " << rsc->stomachLevel << ", Energy: " << rsc->sleepLevel << ", Money: " << rsc->money << std::endl;
-		//std::cout << "Doing: " << people[i]->actionName(people[i]->currentAction) << ", At: " << people[i]->currentPlace->name << std::endl;
-		std::string actionName = "None";
+		Item wish = items[people[i]->wish];
+		std::cout << "Want: " << wish.name << " (" << wish.cost << ")" << std::endl;
+		
+		// Action
+		std::string actionName = "Nothing";
 		Action* act = people[i]->currentExecutiveAction;
 
 		if (people[i]->currentExecutiveAction != nullptr)
@@ -56,12 +70,6 @@ void World::updateTime(double dTime, double timeScale)
 		// NPCs consider next hour schedule
 		for (int i = 0; i < people.size(); i++)
 		{
-			/*
-			//people[i]->followSchedule(time, prevTime);
-			DecisionTreeNode* action = treeManager->workTree->makeDecision(people[i], this);
-			people[i]->currentExecutiveAction = dynamic_cast<Action*>(action);
-			people[i]->currentExecutiveAction->execute(people[i], this);
-			*/
 			people[i]->followSchedule();
 		}
 	}
@@ -76,12 +84,6 @@ void World::updateTime(double dTime, double timeScale)
 	// NPCs update
 	for (int i = 0; i < people.size(); i++)
 	{
-		std::string str = people[i]->currentExecutiveAction->name;
 		people[i]->update(dTime);
-
-		/*
-		if (people[i]->currentExecutiveAction != nullptr)
-			people[i]->currentExecutiveAction->execute(people[i], this);
-		*/
 	}
 }

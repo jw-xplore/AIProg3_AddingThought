@@ -1,7 +1,25 @@
 #include "AllActions.h"
 
+void GainMoneyAction::execute(NPCPerson* person, World* world)
+{
+	person->resources.money += moneyGain;
+}
+
+void BuyWishItemAction::execute(NPCPerson* person, World* world)
+{
+	int wish = person->wish;
+	person->resources.money -= world->items[wish].cost;
+	person->randomWish();
+}
+
 void EatAction::execute(NPCPerson* person, World* world)
 {
+	// Decrease energy
+	person->resources.sleepLevel -= 0.002f;
+	if (person->resources.sleepLevel < 0)
+		person->resources.sleepLevel = 0;
+
+	// Add food 
 	if (person->resources.stomachLevel + foodAdd > 1.0f)
 	{
 		person->resources.stomachLevel = 1;
@@ -13,14 +31,16 @@ void EatAction::execute(NPCPerson* person, World* world)
 
 void WorkAction::execute(NPCPerson* person, World* world)
 {
+	/*
 	// Add money if hour has passed 
 	int prevHour = (int)(world->time - world->lastTimeChange);
 
 	if (prevHour < (int)world->time)
 		person->resources.money += moneyGain;
+	*/
 
 	// Decrease food 
-	person->resources.stomachLevel -= 0.02f;
+	person->resources.stomachLevel -= 0.01f;
 	if (person->resources.stomachLevel < 0)
 		person->resources.stomachLevel = 0;
 
@@ -37,7 +57,7 @@ void WorkAction::execute(NPCPerson* person, World* world)
 void SleepAction::execute(NPCPerson* person, World* world)
 {
 	// Decrease food 
-	person->resources.stomachLevel -= 0.01f;
+	person->resources.stomachLevel -= 0.005f;
 	if (person->resources.stomachLevel < 0)
 		person->resources.stomachLevel = 0;
 
@@ -49,4 +69,17 @@ void SleepAction::execute(NPCPerson* person, World* world)
 	}
 
 	person->resources.sleepLevel += energyGain;
+}
+
+void ShopAction::execute(NPCPerson* person, World* world)
+{
+	// Decrease food 
+	person->resources.stomachLevel -= 0.01f;
+	if (person->resources.stomachLevel < 0)
+		person->resources.stomachLevel = 0;
+
+	// Decrease energy
+	person->resources.sleepLevel -= 0.01f;
+	if (person->resources.sleepLevel < 0)
+		person->resources.sleepLevel = 0;
 }

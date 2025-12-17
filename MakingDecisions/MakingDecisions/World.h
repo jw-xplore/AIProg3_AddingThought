@@ -12,13 +12,12 @@ World representing buldings and players
 class World
 {
 public:
-	TreeManager* treeManager;
-
 	std::vector<Building*> buildings;
 	std::vector<NPCPerson*> people;
+	std::vector<Item> items;
 
 	double lastTimeChange = 0;
-	double time = 6.0f;
+	double time = 15.0f;
 	int day = 1;
 
 	World();

@@ -14,5 +14,5 @@ bool HasEnergyDecision::pass(NPCPerson* person, World* world)
 
 bool HasMoneyDecision::pass(NPCPerson* person, World* world)
 {
-	return person->resources.money > minLevel;
+	return person->resources.money > person->wishCost();
 }

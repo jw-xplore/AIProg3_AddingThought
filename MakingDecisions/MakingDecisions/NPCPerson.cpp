@@ -2,6 +2,7 @@
 #include "DecisionTree.h"
 #include "World.h"
 #include "TreeManager.h"
+#include <random>
 
 NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, Workplace* workplace)
 {
@@ -17,6 +18,8 @@ NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, 
 	this->workplace = workplace;
 
 	currentPlace = home;
+	randomWish();
+	treeManager = new TreeManager(this);
 
 	// Setup stable schedule - fill with work, 8h sleep, wake up 1h before work, eat before work, at lunch time and after work
 	int startW = workplace->startTime;
@@ -132,11 +135,27 @@ std::string NPCPerson::actionName(NPCAction action)
 }
 
 /*
+Call closing action before moving onto another
+*/
+void NPCPerson::finishCurretAction()
+{
+	if (!currentExecutiveAction)
+		return;
+
+	if (currentExecutiveAction->finalAction)
+		currentExecutiveAction->finalAction->execute(this, this->world);
+}
+
+/*
 Perform current action in schedule based on time
 	- Plan next actions for free slots??
 */
 void NPCPerson::followSchedule()
 {
+	// Finish action
+	finishCurretAction();
+
+	// Switch to new action
 	int time = (int)world->time;
 
 	currentAction = schedule[time].action;
@@ -144,14 +163,30 @@ void NPCPerson::followSchedule()
 
 	switch (currentAction)
 	{
-	case NPCAction::Work: foundNode = world->treeManager->workTree->makeDecision(this, this->world); break;
-	case NPCAction::Eat: foundNode = world->treeManager->eatTree->makeDecision(this, this->world); break;
-	case NPCAction::SleepHome: foundNode = world->treeManager->sleepTree->makeDecision(this, this->world); break;
+	case NPCAction::None: foundNode = treeManager->freeTree->makeDecision(this, this->world); break;
+	case NPCAction::Work: foundNode = treeManager->workTree->makeDecision(this, this->world); break;
+	case NPCAction::Eat: foundNode = treeManager->eatTree->makeDecision(this, this->world); break;
+	case NPCAction::SleepHome: foundNode = treeManager->sleepTree->makeDecision(this, this->world); break;
 		//case NPCAction::Hangout: foundNode = world->treeManager->eatTree->makeDecision(this, this->world); break;
 		//case NPCAction::Shop: foundNode = world->treeManager->eatTree->makeDecision(this, this->world); break;
 	}
 
 	currentExecutiveAction = dynamic_cast<Action*>(foundNode);
-	std::string str = currentExecutiveAction->name;
-	int a = 0;
+}
+
+/*
+Pick random id for item that NPC will want to buy
+*/
+void NPCPerson::randomWish()
+{
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dist(0, world->items.size() - 1);
+
+	wish = dist(gen);
+}
+
+int NPCPerson::wishCost()
+{
+	return this->world->items[wish].cost;
 }
