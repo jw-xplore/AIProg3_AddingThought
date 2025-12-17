@@ -78,11 +78,12 @@ public:
 	ScheduleEntry* schedule = new ScheduleEntry[24];
 
 	NPCPerson(std::string name, World* world, int money, Building* home, Workplace* workplace);
+	void update(float dTime);
 	void performAction(NPCAction action);
 	void planDay();
 	std::string actionName(NPCAction action);
 
-	void followSchedule(float time, float prevTime);
+	void followSchedule();
 
 	void work();
 	void eat();

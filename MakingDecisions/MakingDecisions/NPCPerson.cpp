@@ -1,12 +1,14 @@
 #include "NPCPerson.h"
 #include "DecisionTree.h"
 #include "World.h"
+#include "TreeManager.h"
 
 NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, Workplace* workplace)
 {
 	this->name = name;
 	this->world = world;
 
+	this->hp = 1;
 	this->resources.money = money;
 	this->resources.sleepLevel = 0.9;
 	this->resources.stomachLevel = 0.7;
@@ -30,11 +32,37 @@ NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, 
 
 	// Setup schedule
 	planDay();
+	followSchedule();
 
 	// Start action
 	int currentHour = world->time;
 	currentAction = schedule[currentHour].action;
 	currentPlace = schedule[currentHour].place;
+}
+
+void NPCPerson::update(float dTime)
+{
+	// Execute current action
+	if (currentExecutiveAction != nullptr)
+		currentExecutiveAction->execute(this, this->world);
+
+	// Decrease hp if deprived of basics
+	bool deprived = false;
+	if (resources.stomachLevel <= 0 || resources.sleepLevel <= 0)
+		deprived = true;
+
+	if (deprived)
+	{
+		hp -= 0.02f;
+	}
+	else if (hp < 1)
+	{
+		hp += 0.02f;
+	}
+
+	// Die 
+	if (hp <= 0)
+		delete this;
 }
 
 void NPCPerson::performAction(NPCAction action)
@@ -107,18 +135,23 @@ std::string NPCPerson::actionName(NPCAction action)
 Perform current action in schedule based on time
 	- Plan next actions for free slots??
 */
-void NPCPerson::followSchedule(float time, float prevTime)
+void NPCPerson::followSchedule()
 {
-	if ((int)prevTime < (int)time || (int)prevTime == 23 && (int)time == 0)
+	int time = (int)world->time;
+
+	currentAction = schedule[time].action;
+	DecisionTreeNode* foundNode = nullptr;
+
+	switch (currentAction)
 	{
-		// End action - receive gains and loses
-
-		// TODO: Make system based on tasks/action and rewards
-
-		// Start action
-		currentAction = schedule[(int)time].action;
-		currentPlace = schedule[(int)time].place;
+	case NPCAction::Work: foundNode = world->treeManager->workTree->makeDecision(this, this->world); break;
+	case NPCAction::Eat: foundNode = world->treeManager->eatTree->makeDecision(this, this->world); break;
+	case NPCAction::SleepHome: foundNode = world->treeManager->sleepTree->makeDecision(this, this->world); break;
+		//case NPCAction::Hangout: foundNode = world->treeManager->eatTree->makeDecision(this, this->world); break;
+		//case NPCAction::Shop: foundNode = world->treeManager->eatTree->makeDecision(this, this->world); break;
 	}
 
-	//currentAction = schedule[(int)time];
+	currentExecutiveAction = dynamic_cast<Action*>(foundNode);
+	std::string str = currentExecutiveAction->name;
+	int a = 0;
 }

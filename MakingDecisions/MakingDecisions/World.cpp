@@ -1,6 +1,7 @@
 #include "World.h"
 #include <iostream>
 #include "TreeManager.h"
+#include <string>
 
 World::World()
 {
@@ -28,9 +29,15 @@ void World::showPeopleStatus()
 		NPCResources* rsc = &people[i]->resources;
 
 		std::cout << people[i]->name << std::endl;
-		std::cout << "Hunger: " << rsc->stomachLevel << ", Energy: " << rsc->sleepLevel << ", Money: " << rsc->money << std::endl;
+		std::cout << "HP: " << people[i]->hp << ", Hunger: " << rsc->stomachLevel << ", Energy: " << rsc->sleepLevel << ", Money: " << rsc->money << std::endl;
 		//std::cout << "Doing: " << people[i]->actionName(people[i]->currentAction) << ", At: " << people[i]->currentPlace->name << std::endl;
-		std::cout << "Doing: " << people[i]->currentExecutiveAction->name << ", At: " << people[i]->currentPlace->name << std::endl;
+		std::string actionName = "None";
+		Action* act = people[i]->currentExecutiveAction;
+
+		if (people[i]->currentExecutiveAction != nullptr)
+			actionName = people[i]->currentExecutiveAction->name;
+
+		std::cout << "Doing: " << actionName << ", At: " << people[i]->currentPlace->name << std::endl;
 	}
 }
 
@@ -43,7 +50,20 @@ void World::updateTime(double dTime, double timeScale)
 	time += lastTimeChange;
 	if (time - (int)time > 0.6f)
 	{
+		// Progress hour
 		time = (int)time + 1 + (time - (int)time - 0.6f);
+
+		// NPCs consider next hour schedule
+		for (int i = 0; i < people.size(); i++)
+		{
+			/*
+			//people[i]->followSchedule(time, prevTime);
+			DecisionTreeNode* action = treeManager->workTree->makeDecision(people[i], this);
+			people[i]->currentExecutiveAction = dynamic_cast<Action*>(action);
+			people[i]->currentExecutiveAction->execute(people[i], this);
+			*/
+			people[i]->followSchedule();
+		}
 	}
 
 	// Progress days
@@ -53,12 +73,15 @@ void World::updateTime(double dTime, double timeScale)
 		day++;
 	}
 
-	// Update people
+	// NPCs update
 	for (int i = 0; i < people.size(); i++)
 	{
-		//people[i]->followSchedule(time, prevTime);
-		DecisionTreeNode* action = treeManager->workTree->makeDecision(people[i], this);
-		people[i]->currentExecutiveAction = dynamic_cast<Action*>(action);
-		people[i]->currentExecutiveAction->execute(people[i], this);
+		std::string str = people[i]->currentExecutiveAction->name;
+		people[i]->update(dTime);
+
+		/*
+		if (people[i]->currentExecutiveAction != nullptr)
+			people[i]->currentExecutiveAction->execute(people[i], this);
+		*/
 	}
 }

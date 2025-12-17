@@ -14,7 +14,7 @@ public:
 class WorkAction : public Action
 {
 public:
-	float energyLoss = 0.05f;
+	float energyLoss = 0.01f;
 	int moneyGain = 2; // Hourly 
 
 	virtual void execute(NPCPerson* person, World* world) override;
@@ -32,6 +32,7 @@ public:
 	SleepAction() { name = "Sleeping"; }
 };
 
+/*
 class HangoutAction : public Action
 {
 public:
@@ -47,3 +48,4 @@ public:
 
 	ShopAction() { name = "Shopping"; }
 };
+*/

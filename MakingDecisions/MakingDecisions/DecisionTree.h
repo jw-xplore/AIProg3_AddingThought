@@ -13,7 +13,8 @@ public:
 class Action : public DecisionTreeNode
 {
 public:
-	std::string name;
+	std::string name = "";
+	int a = 2;
 	virtual void execute(NPCPerson* person, World* world) {}
 
 	DecisionTreeNode* makeDecision(NPCPerson* person, World* world) override

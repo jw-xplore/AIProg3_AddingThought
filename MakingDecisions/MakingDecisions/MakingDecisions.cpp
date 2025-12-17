@@ -7,7 +7,7 @@
 #include "World.h"
 
 using namespace std;
-const int fps = 1;
+const int fps = 2;
 long long baseSleep = 0;
 double prevDTime = 0;
 
