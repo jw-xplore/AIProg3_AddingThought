@@ -9,6 +9,11 @@ void BuyWishItemAction::execute(NPCPerson* person, World* world)
 {
 	int wish = person->wish;
 	person->resources.money -= world->items[wish].cost;
+	if (person->resources.money < 0)
+	{
+		int a = 0;
+	}
+
 	person->randomWish();
 }
 

@@ -7,7 +7,8 @@
 #include "World.h"
 
 using namespace std;
-const int fps = 5;
+int fps = 1;
+double timeChange = 0.1f;
 long long baseSleep = 0;
 double prevDTime = 0;
 
@@ -20,7 +21,7 @@ void init()
 
 void render()
 {
-    cout << "Day: " << world->day << ", Time: " << world->time << endl;
+    cout << "Day: " << world->day << ", Time: " << world->time << " (Speed: " << fps << " FPS)" << endl;
     cout << "----------------------------------------" << endl;
     world->showPeopleStatus();
     cout << "----------------------------------------" << endl;
@@ -33,7 +34,7 @@ Write all logic into this fuction
 */
 void update(double dTime)
 {
-    world->updateTime(dTime, 0.5f);
+    world->updateTime(timeChange);
 }
 
 int main()
@@ -43,10 +44,20 @@ int main()
 
     while (true)
     {
+        baseSleep = (1.0f / (double)fps) * 1000;
+
         // ESC - press check
         if (GetAsyncKeyState(27) & 0x8000)
             break;
 
+        // Change update speed
+        if (GetAsyncKeyState(VK_LEFT) & 0x8000 && fps > 1)
+            fps--;
+
+        if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+            fps++;
+
+        // Update game
         system("CLS");
         auto start = chrono::system_clock::now();
         update(prevDTime);

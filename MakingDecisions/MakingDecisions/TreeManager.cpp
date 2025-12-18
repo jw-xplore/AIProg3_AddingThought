@@ -27,13 +27,13 @@ void TreeManager::DefineWorkTree()
 	// If enough energy, check hunger
 	Decision* hungerDec = dynamic_cast<Decision*>(energyDec->positive);
 	hungerDec->positive = new HasMoneyDecision(2);
-	hungerDec->negative = new WorkAction(); // Work if not hungry
+	hungerDec->negative = new WorkAction(this->owner->workplace->salary); // Work if not hungry
 
 	// If hungry, check if can eat
 	Decision* moneyDec = dynamic_cast<Decision*>(hungerDec->positive);
 	moneyDec->positive = new EatAction(); // Go for meal
 	//std::string str = dynamic_cast<Action*>(moneyDec->positive)->name;
-	moneyDec->negative = new WorkAction(); // Make money
+	moneyDec->negative = new WorkAction(this->owner->workplace->salary); // Make money
 }
 
 void TreeManager::DefineEatTree()
@@ -53,7 +53,7 @@ void TreeManager::DefineEatTree()
 	// Check if has money
 	Decision* moneyDec = dynamic_cast<Decision*>(hungerDec->positive);
 	moneyDec->positive = new EatAction(); // Go for meal
-	moneyDec->negative = new WorkAction(); // Make money
+	moneyDec->negative = new WorkAction(this->owner->workplace->salary); // Make money
 
 }
 
@@ -84,7 +84,7 @@ void TreeManager::DefineHangoutTree()
 	// Has enough money?
 	Decision* moneyDec = dynamic_cast<Decision*>(energyDec->positive);
 	moneyDec->positive = new HangoutAction(); // Go hangout
-	moneyDec->negative = new WorkAction(); // Work some more
+	moneyDec->negative = new WorkAction(this->owner->workplace->salary); // Work some more
 }
 
 /*
@@ -101,11 +101,11 @@ void TreeManager::DefineFreeTree()
 
 	// Needs sleep?
 	Decision* energyDec = dynamic_cast<Decision*>(hungerDec->negative);
-	energyDec->positive = new HasMoneyDecision(owner->wishCost());
+	energyDec->positive = new HasMoneyForWishDecision();
 	energyDec->negative = new SleepAction(); // Go sleep
 
 	// Can afford to buy wished item?
 	Decision* shopDec = dynamic_cast<Decision*>(energyDec->positive);
 	shopDec->positive = new ShopAction(); // Buy item
-	shopDec->negative = new WorkAction(); // Work some more
+	shopDec->negative = new WorkAction(this->owner->workplace->salary); // Work some more
 }

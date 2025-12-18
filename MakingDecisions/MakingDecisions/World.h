@@ -37,7 +37,7 @@ public:
 
 	void showPeopleStatus();
 	void showMessagesLog();
-	void updateTime(double dTime, double timeScale);
+	void updateTime(double timeChange);
 
 	void logMessage(Message msg, NPCPerson* sender, NPCPerson* recipient);
 

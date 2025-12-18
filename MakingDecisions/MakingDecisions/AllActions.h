@@ -42,10 +42,10 @@ public:
 
 	virtual void execute(NPCPerson* person, World* world) override;
 
-	WorkAction()
+	WorkAction(int pay)
 	{ 
 		name = "Working";
-		finalAction = new GainMoneyAction(2);
+		finalAction = new GainMoneyAction(pay);
 	}
 };
 

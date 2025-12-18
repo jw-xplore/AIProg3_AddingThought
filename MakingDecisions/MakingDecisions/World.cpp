@@ -33,12 +33,16 @@ World::World()
 
 	Building* home1 = new Building("House 001");
 	Building* home2 = new Building("House 002");
-	Workplace* factory = new Workplace("Factory", 2, 0.1, 7, 12, 15);
+	Building* home3 = new Building("House 003");
+	Workplace* factory = new Workplace("Factory", 3, 0.11, 7, 12, 15);
+	Workplace* office = new Workplace("Factory", 2, 0.08, 8, 12, 16);
 
 	houses.push_back(home1);
 	houses.push_back(home2);
+	houses.push_back(home3);
 
 	workplaces.push_back(factory);
+	workplaces.push_back(office);
 
 	shops.push_back(new Building("Market world"));
 
@@ -47,9 +51,9 @@ World::World()
 
 	// People
 	people.push_back(new NPCPerson("Bjorn", this, 10, home1, factory));
-	people.push_back(new NPCPerson("Aron", this, 15, home2, factory));
-	people.push_back(new NPCPerson("Linda", this, 15, home2, factory));
-	people.push_back(new NPCPerson("Vilma", this, 15, home2, factory));
+	people.push_back(new NPCPerson("Aron", this, 20, home2, office));
+	people.push_back(new NPCPerson("Linda", this, 25, home2, factory));
+	people.push_back(new NPCPerson("Vilma", this, 14, home3, office));
 
 	// Setup message log
 	for (int i = 0; i < messagesLogSize; i++)
@@ -99,12 +103,12 @@ void World::showMessagesLog()
 /*
 Progress time and day and apply changes on NPCs
 */
-void World::updateTime(double dTime, double timeScale)
+void World::updateTime(double timeChange)
 {
 	float prevTime = time;
 
 	// Progress time
-	lastTimeChange = dTime * timeScale;
+	lastTimeChange = timeChange;
 	time += lastTimeChange;
 	if (time - (int)time > 0.6f)
 	{
@@ -127,6 +131,8 @@ void World::updateTime(double dTime, double timeScale)
 		day++;
 		dayChange = true;
 	}
+
+	float dTime = timeChange * 0.6f;
 
 	// NPCs update
 	for (int i = 0; i < people.size(); i++)
