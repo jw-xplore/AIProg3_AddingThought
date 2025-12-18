@@ -12,6 +12,7 @@ TreeManager::TreeManager(NPCPerson* person)
 	DefineWorkTree();
 	DefineEatTree();
 	DefineSleepTree();
+	DefineHangoutTree();
 }
 
 void TreeManager::DefineWorkTree()
@@ -58,12 +59,32 @@ void TreeManager::DefineEatTree()
 
 void TreeManager::DefineSleepTree()
 {
-	sleepTree = new HasEnergyDecision(0.9f);
+	sleepTree = new HasEnergyDecision(0.99f);
 	
 	// Check if want to sleep
 	Decision* energyDec = dynamic_cast<Decision*>(sleepTree);
 	energyDec->positive = freeTree; // Consider free action
 	energyDec->negative = new SleepAction(); // Go sleep
+}
+
+void TreeManager::DefineHangoutTree()
+{
+	hangoutTree = new IsHungryDecision(0.4f);
+
+	// Is NPC hungry?
+	Decision* hungerDec = dynamic_cast<Decision*>(hangoutTree);
+	hungerDec->positive = new EatAction(); // Eat
+	hungerDec->negative = new HasEnergyDecision(0.3f);
+
+	// Needs sleep?
+	Decision* energyDec = dynamic_cast<Decision*>(hungerDec->negative);
+	energyDec->positive = new HasMoneyDecision(5);
+	energyDec->negative = new SleepAction(); // Go sleep
+
+	// Has enough money?
+	Decision* moneyDec = dynamic_cast<Decision*>(energyDec->positive);
+	moneyDec->positive = new HangoutAction(); // Go hangout
+	moneyDec->negative = new WorkAction(); // Work some more
 }
 
 /*

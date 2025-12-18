@@ -5,12 +5,22 @@ class GainMoneyAction : public Action
 {
 public:
 	int moneyGain = 2;
+	GainMoneyAction(int money)
+	{
+		moneyGain = money;
+	}
+
 	virtual void execute(NPCPerson* person, World* world) override;
 };
 
 class BuyWishItemAction : public Action
 {
 public:
+	virtual void execute(NPCPerson* person, World* world) override;
+};
+
+class EndMeetingAction : public Action
+{
 	virtual void execute(NPCPerson* person, World* world) override;
 };
 
@@ -35,18 +45,30 @@ public:
 	WorkAction()
 	{ 
 		name = "Working";
-		finalAction = new GainMoneyAction();
+		finalAction = new GainMoneyAction(2);
 	}
 };
 
 class SleepAction : public Action
 {
 public:
-	float energyGain = 0.05f;
+	float energyGain = 0.03f;
 
 	virtual void execute(NPCPerson* person, World* world) override;
 
 	SleepAction() { name = "Sleeping"; }
+};
+
+class HangoutAction : public Action
+{
+public:
+	virtual void execute(NPCPerson* person, World* world) override;
+
+	HangoutAction() 
+	{ 
+		name = "Hanging out"; 
+		finalAction = new EndMeetingAction();
+	}
 };
 
 class ShopAction : public Action
@@ -60,22 +82,3 @@ public:
 		finalAction = new BuyWishItemAction();
 	}
 };
-
-
-/*
-class HangoutAction : public Action
-{
-public:
-	virtual void execute(NPCPerson* person, World* world) override;
-
-	HangoutAction() { name = "Hanging out"; }
-};
-
-class ShopAction : public Action
-{
-public:
-	virtual void execute(NPCPerson* person, World* world) override;
-
-	ShopAction() { name = "Shopping"; }
-};
-*/

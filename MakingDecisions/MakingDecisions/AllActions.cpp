@@ -12,6 +12,12 @@ void BuyWishItemAction::execute(NPCPerson* person, World* world)
 	person->randomWish();
 }
 
+void EndMeetingAction::execute(NPCPerson* person, World* world)
+{
+	person->resources.money -= 5;
+	person->meeting = nullptr;
+}
+
 void EatAction::execute(NPCPerson* person, World* world)
 {
 	person->currentPlace = world->diners[0];
@@ -67,6 +73,19 @@ void SleepAction::execute(NPCPerson* person, World* world)
 	}
 
 	person->resources.sleepLevel += energyGain;
+}
+
+void HangoutAction::execute(NPCPerson* person, World* world)
+{
+	// Decrease food 
+	person->resources.stomachLevel -= 0.01f;
+	if (person->resources.stomachLevel < 0)
+		person->resources.stomachLevel = 0;
+
+	// Decrease energy
+	person->resources.sleepLevel -= 0.002f;
+	if (person->resources.sleepLevel < 0)
+		person->resources.sleepLevel = 0;
 }
 
 void ShopAction::execute(NPCPerson* person, World* world)

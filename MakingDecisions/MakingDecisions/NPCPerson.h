@@ -65,6 +65,7 @@ struct ScheduleEntry
 };
 
 class Message;
+class InviteMessage;
 
 class NPCPerson
 {
@@ -75,6 +76,7 @@ public:
 
 	std::vector<Message*> messagesQueue;
 	float reachOutTime = 0;
+	InviteMessage* meeting = nullptr;
 
 	World* world;
 	int wish = -1; // stuff that person wants to buy

@@ -119,16 +119,27 @@ void World::updateTime(double dTime, double timeScale)
 	}
 
 	// Progress days
+	bool dayChange = false;
+
 	if (time > 24)
 	{
 		time = time - 24.0f;
 		day++;
+		dayChange = true;
 	}
 
 	// NPCs update
 	for (int i = 0; i < people.size(); i++)
 	{
 		people[i]->update(dTime);
+	}
+
+	if (dayChange)
+	{
+		for (int i = 0; i < people.size(); i++)
+		{
+			people[i]->planDay();
+		}
 	}
 }
 
@@ -140,6 +151,9 @@ void World::logMessage(Message msg, NPCPerson* sender, NPCPerson* recipient)
 	std::string content = "(" + sender->name + "->" + recipient->name + ")" + msg.content;
 	if (!msg.inPerson)
 		content = "SMS " + content;
+
+	// time log
+	content = "[ Day: " + std::to_string(this->day) + " hour: " + std::to_string(this->time) + "]" + content;
 
 	if (lastMsg < messagesLogSize - 1)
 	{

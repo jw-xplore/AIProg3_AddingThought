@@ -4,6 +4,7 @@
 #include "TreeManager.h"
 #include "Message.h"
 #include <random>
+#include "AllActions.h"
 
 NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, Workplace* workplace)
 {
@@ -139,6 +140,12 @@ void NPCPerson::planDay()
 			schedule[x] = ScheduleEntry(action, place);
 		}
 	}
+
+	// Readd meeting from yesterday
+	if (meeting)
+	{
+		schedule[meeting->hour] = ScheduleEntry(NPCAction::Hangout, meeting->place);
+	}
 }
 
 /*
@@ -194,8 +201,43 @@ void NPCPerson::followSchedule()
 	case NPCAction::Work: foundNode = treeManager->workTree->makeDecision(this, this->world); break;
 	case NPCAction::Eat: foundNode = treeManager->eatTree->makeDecision(this, this->world); break;
 	case NPCAction::SleepHome: foundNode = treeManager->sleepTree->makeDecision(this, this->world); break;
-		//case NPCAction::Hangout: foundNode = world->treeManager->eatTree->makeDecision(this, this->world); break;
+	case NPCAction::Hangout: foundNode = treeManager->hangoutTree->makeDecision(this, this->world); break;
 		//case NPCAction::Shop: foundNode = world->treeManager->eatTree->makeDecision(this, this->world); break;
+	}
+
+	// Check if meeting is not happening?
+	if (currentAction == NPCAction::Hangout && dynamic_cast<HangoutAction*>(foundNode) == nullptr && meeting)
+	{
+		// Log cancelation
+		Message msg = Message();
+		msg.sender = this;
+		msg.inPerson = false;
+		msg.content = "Sorry, I got to cancel.";
+
+		// Reason
+		if (dynamic_cast<EatAction*>(foundNode))
+			msg.content += " I am starving.";
+		else if (dynamic_cast<SleepAction*>(foundNode))
+			msg.content += " I am tired.";
+		else if (dynamic_cast<WorkAction*>(foundNode))
+			msg.content += " I am out of money.";
+
+		this->world->logMessage(msg, this, meeting->sender);
+
+		// Cancel meeting
+		meeting->sender->meeting = nullptr;
+		meeting = nullptr;
+	}
+
+	// Report hanging out
+	if (currentAction == NPCAction::Hangout && dynamic_cast<HangoutAction*>(foundNode) && meeting)
+	{
+		Message msg = Message();
+		msg.sender = this;
+		msg.inPerson = true;
+		msg.content = "Skal! *clink*clink";
+
+		this->world->logMessage(msg, this, meeting->sender);
 	}
 
 	currentExecutiveAction = dynamic_cast<Action*>(foundNode);
@@ -223,6 +265,10 @@ Sending messages to other NPCs
 */
 void NPCPerson::sendMessage(NPCPerson* recipient)
 {
+	// Skip if sleeping 
+	if (currentAction == NPCAction::SleepHome)
+		return;
+
 	// Try send invite
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
@@ -245,6 +291,11 @@ void NPCPerson::sendMessage(NPCPerson* recipient)
 
 void NPCPerson::sendInvite(NPCPerson* recipient)
 {
+	// Skip if already has meeting
+	if (meeting != nullptr)
+		return;
+
+	// Message setup
 	InviteMessage* msg = new InviteMessage();
 	msg->sender = this;
 	msg->inPerson = this->currentPlace == recipient->currentPlace;
@@ -277,7 +328,7 @@ void NPCPerson::handleMessageQueue()
 		{
 			bool positive = true;
 
-			if (schedule[invite->hour].action != NPCAction::None)
+			if (schedule[invite->hour].action != NPCAction::None || meeting != nullptr)
 			{
 				// Say no if blocked
 				positive = false;
@@ -304,11 +355,12 @@ void NPCPerson::handleMessageQueue()
 				msg->content = "Yes!";
 
 				// Store in schedule
+				meeting = invite;
 				this->schedule[invite->hour].action = NPCAction::Hangout;
 				this->schedule[invite->hour].place = invite->place;
 			}
 			else
-				msg->content = "Sorry, can't make it.";
+				msg->content = "No, can't make it.";
 
 			this->world->logMessage(*msg, this, messagesQueue[i]->sender);
 

@@ -30,7 +30,7 @@ public:
 
 
 	double lastTimeChange = 0;
-	double time = 15.0f;
+	double time = 6.0f;
 	int day = 1;
 
 	World();

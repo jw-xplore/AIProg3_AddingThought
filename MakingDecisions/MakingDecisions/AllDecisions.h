@@ -27,3 +27,8 @@ public:
 	HasMoneyDecision(int level) { minLevel = level; }
 	virtual bool pass(NPCPerson* person, World* world) override;
 };
+
+class HasMoneyForWishDecision : public Decision
+{
+	virtual bool pass(NPCPerson* person, World* world) override;
+};
