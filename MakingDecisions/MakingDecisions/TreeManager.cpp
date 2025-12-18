@@ -8,9 +8,11 @@ TreeManager::TreeManager(NPCPerson* person)
 	owner = person;
 
 	// Define decision trees
+	DefineWorkTypeTree();
 	DefineFreeTree();
-	DefineWorkTree();
 	DefineEatTree();
+
+	DefineWorkTree();
 	DefineSleepTree();
 	DefineHangoutTree();
 }
@@ -26,19 +28,14 @@ void TreeManager::DefineWorkTree()
 
 	// If enough energy, check hunger
 	Decision* hungerDec = dynamic_cast<Decision*>(energyDec->positive);
-	hungerDec->positive = new HasMoneyDecision(2);
-	hungerDec->negative = new WorkAction(this->owner->workplace->salary); // Work if not hungry
-
-	// If hungry, check if can eat
-	Decision* moneyDec = dynamic_cast<Decision*>(hungerDec->positive);
-	moneyDec->positive = new EatAction(); // Go for meal
-	//std::string str = dynamic_cast<Action*>(moneyDec->positive)->name;
-	moneyDec->negative = new WorkAction(this->owner->workplace->salary); // Make money
+	hungerDec->positive = eatTree; // Eat
+	hungerDec->negative = workTypeTree; // Work if not hungry
 }
 
 void TreeManager::DefineEatTree()
 {
 	eatTree = new IsHungryDecision(0.9f);
+	Diner* diner = owner->world->diners[0];
 
 	// Check if wants to eat
 	Decision* hungerDec = dynamic_cast<Decision*>(eatTree);
@@ -47,13 +44,13 @@ void TreeManager::DefineEatTree()
 
 	// If hungry, check sleepiness
 	Decision* energyDec = dynamic_cast<Decision*>(hungerDec->positive);
-	energyDec->positive = new HasMoneyDecision(2);
+	energyDec->positive = new HasMoneyDecision(diner->cost);
 	energyDec->negative = new SleepAction(); // Go sleep
 
 	// Check if has money
-	Decision* moneyDec = dynamic_cast<Decision*>(hungerDec->positive);
-	moneyDec->positive = new EatAction(); // Go for meal
-	moneyDec->negative = new WorkAction(this->owner->workplace->salary); // Make money
+	Decision* moneyDec = dynamic_cast<Decision*>(energyDec->positive);
+	moneyDec->positive = new EatAction(diner); // Go for meal
+	moneyDec->negative = workTypeTree; // Make money
 
 }
 
@@ -70,21 +67,22 @@ void TreeManager::DefineSleepTree()
 void TreeManager::DefineHangoutTree()
 {
 	hangoutTree = new IsHungryDecision(0.4f);
+	Bar* bar = owner->world->bars[0];
 
 	// Is NPC hungry?
 	Decision* hungerDec = dynamic_cast<Decision*>(hangoutTree);
-	hungerDec->positive = new EatAction(); // Eat
+	hungerDec->positive = eatTree; // Eat
 	hungerDec->negative = new HasEnergyDecision(0.3f);
 
 	// Needs sleep?
 	Decision* energyDec = dynamic_cast<Decision*>(hungerDec->negative);
-	energyDec->positive = new HasMoneyDecision(5);
+	energyDec->positive = new HasMoneyDecision(bar->cost + 5);
 	energyDec->negative = new SleepAction(); // Go sleep
 
 	// Has enough money?
 	Decision* moneyDec = dynamic_cast<Decision*>(energyDec->positive);
-	moneyDec->positive = new HangoutAction(); // Go hangout
-	moneyDec->negative = new WorkAction(this->owner->workplace->salary); // Work some more
+	moneyDec->positive = new HangoutAction(bar); // Go hangout
+	moneyDec->negative = workTypeTree; // Work some more
 }
 
 /*
@@ -96,7 +94,7 @@ void TreeManager::DefineFreeTree()
 
 	// Is NPC at least little hungry?
 	Decision* hungerDec = dynamic_cast<Decision*>(freeTree);
-	hungerDec->positive = new EatAction(); // Eat
+	hungerDec->positive = new EatAction(owner->world->diners[0]); // Eat
 	hungerDec->negative = new HasEnergyDecision(0.4f);
 
 	// Needs sleep?
@@ -107,5 +105,18 @@ void TreeManager::DefineFreeTree()
 	// Can afford to buy wished item?
 	Decision* shopDec = dynamic_cast<Decision*>(energyDec->positive);
 	shopDec->positive = new ShopAction(); // Buy item
-	shopDec->negative = new WorkAction(this->owner->workplace->salary); // Work some more
+	shopDec->negative = workTypeTree; // Work some more
+}
+
+/*
+Decides if goes working to regular workplace or to side hustle factory
+*/
+void TreeManager::DefineWorkTypeTree()
+{
+	workTypeTree = new WorkplaceIsOpenDecision();
+
+	// Is workplace open
+	Decision* workplaceOpenDec = dynamic_cast<Decision*>(workTypeTree);
+	workplaceOpenDec->positive = new WorkAction(this->owner->workplace, false); // Regular work
+	workplaceOpenDec->negative = new WorkAction(this->owner->world->sidehustleFactory, true); // Side hustle
 }

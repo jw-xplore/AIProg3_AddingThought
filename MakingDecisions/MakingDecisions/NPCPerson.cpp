@@ -12,9 +12,9 @@ NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, 
 	this->world = world;
 
 	this->hp = 1;
-	this->resources.money = money;
-	this->resources.sleepLevel = 0.9;
-	this->resources.stomachLevel = 0.7;
+	this->resources.money = randomNum(10, 50);;
+	this->resources.sleepLevel = randomNum(0.6, 1);
+	this->resources.stomachLevel = randomNum(0.3, 0.7);
 
 	this->home = home;
 	this->workplace = workplace;
@@ -375,4 +375,12 @@ void NPCPerson::handleMessageQueue()
 
 	// Remove all
 	messagesQueue.clear();
+}
+
+float NPCPerson::randomNum(float min, float max)
+{
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dist(min, max);
+	return dist(gen);
 }

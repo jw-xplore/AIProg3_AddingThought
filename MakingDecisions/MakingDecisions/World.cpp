@@ -6,8 +6,6 @@
 
 World::World()
 {
-	//treeManager = new TreeManager();
-
 	// Items
 	items.push_back(Item("Coffee", 10));
 	items.push_back(Item("Kanelbulle", 20));
@@ -18,24 +16,12 @@ World::World()
 	items.push_back(Item("Raggarbil", 1000));
 
 	// Buildings
-	/*
-	Building* home1 = new Building("House 001");
-	Building* home2 = new Building("House 002");
-	Workplace* factory = new Workplace("Factory", 2, 0.1, 7, 12, 15);
-	Building* shop = new Building("Market world", 2, 0.1, 7, 12, 15);
-	*/
-
-	/*
-	buildings.push_back(home1);
-	buildings.push_back(factory);
-	buildings.push_back(new Diner("Buffet", 2, 0.3, 0.05));
-	*/
-
 	Building* home1 = new Building("House 001");
 	Building* home2 = new Building("House 002");
 	Building* home3 = new Building("House 003");
-	Workplace* factory = new Workplace("Factory", 3, 0.11, 7, 12, 15);
-	Workplace* office = new Workplace("Factory", 2, 0.08, 8, 12, 16);
+
+	Workplace* factory = new Workplace("Factory", 5, 0.1, 7, 12, 15);
+	Workplace* office = new Workplace("Office", 4, 0.08, 8, 12, 16);
 
 	houses.push_back(home1);
 	houses.push_back(home2);
@@ -43,11 +29,12 @@ World::World()
 
 	workplaces.push_back(factory);
 	workplaces.push_back(office);
+	sidehustleFactory = new Workplace("Side Hustle CO", 2, 0.12, 1, 12, 23);
 
 	shops.push_back(new Building("Market world"));
 
-	diners.push_back(new Diner("Buffet", 2, 0.1f, 0.01f));
-	bars.push_back(new Bar("Drunk Elk", 5, 0.1));
+	diners.push_back(new Diner("Buffet", 4, 0.1f, 0.01f));
+	bars.push_back(new Bar("Drunk Elk", 10, 0.1));
 
 	// People
 	people.push_back(new NPCPerson("Bjorn", this, 10, home1, factory));
@@ -159,7 +146,9 @@ void World::logMessage(Message msg, NPCPerson* sender, NPCPerson* recipient)
 		content = "SMS " + content;
 
 	// time log
-	content = "[ Day: " + std::to_string(this->day) + " hour: " + std::to_string(this->time) + "]" + content;
+	std::string timeStr = std::to_string(this->time);
+	timeStr = timeStr.substr(0, 5);
+	content = "[Day: " + std::to_string(this->day) + " Hour: " + timeStr + "] " + content;
 
 	if (lastMsg < messagesLogSize - 1)
 	{

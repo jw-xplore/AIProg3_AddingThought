@@ -3,6 +3,10 @@
 void GainMoneyAction::execute(NPCPerson* person, World* world)
 {
 	person->resources.money += moneyGain;
+	if (person->resources.money < 0)
+	{
+		int a = 0;
+	}
 }
 
 void BuyWishItemAction::execute(NPCPerson* person, World* world)
@@ -19,13 +23,13 @@ void BuyWishItemAction::execute(NPCPerson* person, World* world)
 
 void EndMeetingAction::execute(NPCPerson* person, World* world)
 {
-	person->resources.money -= 5;
+	person->resources.money -= this->cost;
 	person->meeting = nullptr;
 }
 
 void EatAction::execute(NPCPerson* person, World* world)
 {
-	person->currentPlace = world->diners[0];
+	person->currentPlace = this->diner;
 
 	// Decrease energy
 	person->resources.sleepLevel -= 0.002f;
@@ -44,7 +48,7 @@ void EatAction::execute(NPCPerson* person, World* world)
 
 void WorkAction::execute(NPCPerson* person, World* world)
 {
-	person->currentPlace = person->workplace;
+	person->currentPlace = this->workplace;
 
 	// Decrease food 
 	person->resources.stomachLevel -= 0.01f;

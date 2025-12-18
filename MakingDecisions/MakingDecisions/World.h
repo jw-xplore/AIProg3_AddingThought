@@ -23,8 +23,9 @@ public:
 	std::vector<Diner*> diners;
 	std::vector<Bar*> bars;
 	std::vector<Workplace*> workplaces;
+	Workplace* sidehustleFactory;
 
-	int messagesLogSize = 10;
+	int messagesLogSize = 16;
 	int lastMsg = -1;
 	std::string* messagesLog = new std::string[messagesLogSize];
 

@@ -19,5 +19,16 @@ bool HasMoneyDecision::pass(NPCPerson* person, World* world)
 
 bool HasMoneyForWishDecision::pass(NPCPerson* person, World* world)
 {
-	return person->resources.money > person->wishCost();
+	return person->resources.money + 20 > person->wishCost();
+}
+
+/*
+Return true if current time is between start and end of persons workplace shift
+*/
+bool WorkplaceIsOpenDecision::pass(NPCPerson* person, World* world)
+{
+	int s = person->workplace->startTime;
+	int e = person->workplace->endTime;
+
+	return s <= world->time && world->time <= e - 1;
 }

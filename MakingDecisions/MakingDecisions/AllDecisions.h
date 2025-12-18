@@ -32,3 +32,8 @@ class HasMoneyForWishDecision : public Decision
 {
 	virtual bool pass(NPCPerson* person, World* world) override;
 };
+
+class WorkplaceIsOpenDecision : public Decision
+{
+	virtual bool pass(NPCPerson* person, World* world) override;
+};

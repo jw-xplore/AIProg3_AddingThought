@@ -21,31 +21,56 @@ public:
 
 class EndMeetingAction : public Action
 {
+public:
+	int cost = 0;
+
 	virtual void execute(NPCPerson* person, World* world) override;
+
+	EndMeetingAction(int cost)
+	{
+		this->cost = cost;
+	}
 };
 
 class EatAction : public Action
 {
 public:
+	Diner* diner;
 	float foodAdd = 0.1f;
+	int cost;
 
 	virtual void execute(NPCPerson* person, World* world) override;
 
-	EatAction() { name = "Eating"; }
+	EatAction(Diner* diner)
+	{ 
+		name = "Eating";
+
+		this->diner = diner;
+		foodAdd = diner->stomachLevelGain;
+		cost = diner->cost;
+
+		finalAction = new GainMoneyAction(-cost);
+	}
 };
 
 class WorkAction : public Action
 {
 public:
+	Workplace* workplace;
 	float energyLoss = 0.01f;
 	int moneyGain = 2; // Hourly 
 
 	virtual void execute(NPCPerson* person, World* world) override;
 
-	WorkAction(int pay)
+	WorkAction(Workplace* workplace, bool sideHustle = false)
 	{ 
 		name = "Working";
-		finalAction = new GainMoneyAction(pay);
+		if (sideHustle)
+			name += " on side";
+
+		this->workplace = workplace;
+		finalAction = new GainMoneyAction(workplace->salary);
+		energyLoss = workplace->energyLoss;
 	}
 };
 
@@ -62,12 +87,15 @@ public:
 class HangoutAction : public Action
 {
 public:
+	Bar* bar;
+
 	virtual void execute(NPCPerson* person, World* world) override;
 
-	HangoutAction() 
+	HangoutAction(Bar* bar) 
 	{ 
 		name = "Hanging out"; 
-		finalAction = new EndMeetingAction();
+		finalAction = new EndMeetingAction(bar->cost);
+		this->bar = bar;
 	}
 };
 

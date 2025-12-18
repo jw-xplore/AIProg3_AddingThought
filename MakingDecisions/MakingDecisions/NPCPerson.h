@@ -110,5 +110,7 @@ public:
 	void sendMessage(NPCPerson* recipient);
 	void sendInvite(NPCPerson* recipient);
 	void handleMessageQueue();
+
+	float randomNum(float min, float max);
 };
 
