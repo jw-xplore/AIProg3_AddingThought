@@ -13,8 +13,8 @@ NPCPerson::NPCPerson(std::string name, World* world, int money, Building* home, 
 
 	this->hp = 1;
 	this->resources.money = randomNum(10, 50);;
-	this->resources.sleepLevel = randomNum(0.6, 1);
-	this->resources.stomachLevel = randomNum(0.3, 0.7);
+	this->resources.sleepLevel = 0.9;
+	this->resources.stomachLevel = 0.8;
 
 	this->home = home;
 	this->workplace = workplace;
